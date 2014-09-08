@@ -52,6 +52,10 @@ app.get('/calendar/all', function (req, res) {
       console.log(err);
     }
 
+    calendarList.items = calendarList.items.filter(function (calendar) {
+      return 'owner' === calendar.accessRole;
+    });
+
     return res.send(calendarList);
   });
 });
