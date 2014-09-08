@@ -8,8 +8,7 @@ var express = require('express'),
     projects = require('./lib/forecast/projects.js'),
     calendar = require('./lib/calendar.js'),
     Q = require('q'),
-    dateFormat = require('dateformat'),
-    config = require('./lib/config.js');
+    syncs = require('./lib/syncs.js');
 
 var app = express();
 app.use(morgan('combined'));
@@ -71,6 +70,9 @@ app.post('/calendar/sync', function (req, res) {
   var personId = req.query.person;
   var today = new Date();
   var nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  // Save to MongoDb
+  syncs.insert(personId, req.query.calendar, req.query.access_token, req.query.refresh_token);
 
   var options = {
     startDate: today,
