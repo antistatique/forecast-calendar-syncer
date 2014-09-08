@@ -87,16 +87,16 @@ app.post('/calendar/sync', function (req, res) {
 
       forecastResults.push(
         Q.all([
-          projects.findById(assignment.project_id),
+          projects.getFullName(assignment.project_id),
           people.findById(assignment.person_id)
-        ]).spread(function (project, person) {
+        ]).spread(function (projectName, person) {
           data.push({
-            project: project.name,
+            project: projectName,
             person: person.first_name,
             assignment: assignment
           });
 
-          calendar.insert(req, project.name, assignment);
+          calendar.insert(req, projectName, assignment);
         })
       );
     });
