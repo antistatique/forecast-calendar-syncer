@@ -70,7 +70,6 @@ forecastCalendarSyncerApp.controller('CalendarCtrl', function ($scope, $http, $l
     });
     syncRequest.then(function (response) {
       $scope.assignments = response.data;
-      console.log(response.data);
     });
   };
 });
