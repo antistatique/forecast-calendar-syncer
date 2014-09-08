@@ -34,7 +34,7 @@
             <select name="calendar" id="calendar" class="form-control" ng-model="data.calendar">
               <option value=""></option>
               <option ng-repeat="calendar in calendars.items" value="{{ calendar.id }}">
-                {{ calendar.id }}
+                {{ calendar.summary }}
               </option>
             </select>
           </div>
