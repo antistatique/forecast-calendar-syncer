@@ -18,6 +18,15 @@ forecastCalendarSyncerApp.controller('CalendarCtrl', function ($scope, $http, $l
   });
   peopleRequest.then(function (response) {
     $scope.people = response.data;
+    $scope.people.sort(function (a, b) {
+      if (a.first_name > b.first_name) {
+        return 1;
+      }
+      if (a.first_name < b.first_name) {
+        return -1;
+      }
+      return 0;
+    });
   });
 
   var queryString = $location.search();
@@ -36,6 +45,18 @@ forecastCalendarSyncerApp.controller('CalendarCtrl', function ($scope, $http, $l
   });
   calendarsRequest.then(function (response) {
     $scope.calendars = response.data;
+    $scope.calendars.items.sort(function (a, b) {
+      var aSummary = a.summary.toUpperCase();
+      var bSummary = b.summary.toUpperCase();
+
+      if (aSummary > bSummary) {
+        return 1;
+      }
+      if (aSummary < bSummary) {
+        return -1;
+      }
+      return 0;
+    });
   });
 
   $scope.sync = function () {
