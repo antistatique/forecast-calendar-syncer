@@ -17,7 +17,7 @@ app.use(express.static(__dirname + '/public'));
 app.listen(process.env.PORT || 8080);
 
 app.get('/calendar/auth', function (req, res) {
-  var oauth2Client = calendar.getOauth2Client(req);
+  var oauth2Client = calendar.getOauth2Client();
 
   // generate a url that asks permissions for Google+ and Google Calendar scopes
   var scopes = [
@@ -34,19 +34,18 @@ app.get('/calendar/auth', function (req, res) {
 });
 
 app.get('/calendar/auth/callback', function (req, res) {
-  var oauth2Client = calendar.getOauth2Client(req);
+  calendar.getTokens(req.query.code)
+    .then(function (tokens) {
+      if (tokens.refresh_token) {
+        return res.redirect('/calendar.html?access_token=' + tokens.access_token + '&refresh_token=' + tokens.refresh_token);
+      }
 
-  oauth2Client.getToken(req.query.code, function(err, tokens) {
-    if (tokens.refresh_token) {
-      return res.redirect('/calendar.html?access_token=' + tokens.access_token + '&refresh_token=' + tokens.refresh_token);
-    }
-
-    return res.redirect('/calendar.html?access_token=' + tokens.access_token);
-  });
+      return res.redirect('/calendar.html?access_token=' + tokens.access_token);
+    });
 });
 
 app.get('/calendar/all', function (req, res) {
-  var calendarApi = calendar.getApi(req);
+  var calendarApi = calendar.getApi(req.query.access_token, req.query.refresh_token);
   calendarApi.calendarList.list(function (err, calendarList) {
     if (err) {
       console.log(err);
@@ -67,6 +66,7 @@ app.get('/forecast/people', function (req, res) {
 });
 
 app.post('/calendar/sync', function (req, res) {
+  var calendarApi = calendar.getApi(req.query.access_token, req.query.refresh_token);
   var personId = req.query.person;
   var today = new Date();
   var nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -100,7 +100,7 @@ app.post('/calendar/sync', function (req, res) {
             assignment: assignment
           });
 
-          calendar.insert(req, projectName, assignment);
+          calendar.insert(calendarApi, req.query.calendar, projectName, assignment);
         })
       );
     });
