@@ -41,6 +41,14 @@
         </div>
         <hr />
         <div class="row">
+          <h3>Please notice:</h3>
+          <ul>
+            <li>It will sync just the current week.</li>
+            <li>It will not remove anything, even if the assignement is removed from Forecastapp</li>
+            <li>If you remove an event from the calendar, it will not be re-created.</li>
+          </ul>
+        </div>
+        <div class="row">
           <div class="form-group col-md-4">
             <button class="btn btn-primary" ng-click="sync()" ng-disabled="!data.person || !data.calendar">Sync!</button>
           </div>
