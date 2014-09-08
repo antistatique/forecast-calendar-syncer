@@ -20,3 +20,5 @@ gulp.task('develop', [ 'sass', 'serve' ], function () {
     gulp.start('sass', cb);
   });
 });
+
+gulp.task('heroku', [ 'sass' ]);
