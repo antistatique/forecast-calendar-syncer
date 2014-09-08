@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="forecastCalendarSyncerApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Forecast - Google Calendar Syncer</title>
+
+    <link href="/css/basic.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="container" ng-controller="CalendarCtrl">
+      <form>
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label for="person">Select Forecast person</label>
+            <select name="person" id="person" class="form-control" ng-model="data.person">
+              <option value=""></option>
+              <option ng-repeat="person in people" value="{{ person.id }}">
+                {{ person.first_name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="calendar">Select calendar</label>
+            <select name="calendar" id="calendar" class="form-control" ng-model="data.calendar">
+              <option value=""></option>
+              <option ng-repeat="calendar in calendars.items" value="{{ calendar.id }}">
+                {{ calendar.id }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <hr />
+        <div class="row">
+          <div class="form-group col-md-4">
+            <button class="btn btn-primary" ng-click="sync()">Sync!</button>
+          </div>
+        </div>
+      </form>
+
+      <table class="table">
+        <tr>
+          <th>Project</th>
+          <th>Person</th>
+          <th>Start date</th>
+          <th>End date</th>
+        </tr>
+        <tr ng-repeat="assignment in assignments">
+          <td>{{ assignment.project }}</td>
+          <td>{{ assignment.person }}</td>
+          <td>{{ assignment.assignment.start_date }}</td>
+          <td>{{ assignment.assignment.end_date }}</td>
+        </tr>
+      </table>
+
+      <p class="alert alert-success" ng-show="assignments.length">Done!</p>
+    </div><!-- /.container -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/vendor/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+    <script src="/vendor/angular/angular.min.js"></script>
+    <script src="/app/controllers/calendar.js"></script>
+  </body>
+</html>
