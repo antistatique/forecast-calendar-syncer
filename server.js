@@ -8,7 +8,8 @@ var express = require('express'),
     projects = require('./lib/forecast/projects.js'),
     calendar = require('./lib/calendar.js'),
     Q = require('q'),
-    syncs = require('./lib/syncs.js');
+    syncs = require('./lib/syncs.js'),
+    CronJob = require('cron').CronJob;
 
 var app = express();
 app.use(morgan('combined'));
@@ -65,14 +66,14 @@ app.get('/forecast/people', function (req, res) {
   });
 });
 
-app.post('/calendar/sync', function (req, res) {
-  var calendarApi = calendar.getApi(req.query.access_token, req.query.refresh_token);
-  var personId = req.query.person;
+var doSync = function (accessToken, refreshToken, personId, calendarId) {
+  var calendarApi = calendar.getApi(accessToken, refreshToken);
   var today = new Date();
   var nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  var deferred = Q.defer();
 
   // Save to MongoDb
-  syncs.insert(personId, req.query.calendar, req.query.access_token, req.query.refresh_token);
+  syncs.insert(personId, calendarId, accessToken, refreshToken);
 
   var options = {
     startDate: today,
@@ -103,13 +104,33 @@ app.post('/calendar/sync', function (req, res) {
             assignment: assignment
           });
 
-          calendar.insert(calendarApi, req.query.calendar, projectName, assignment);
+          calendar.insert(calendarApi, calendarId, projectName, assignment);
         })
       );
     });
 
     Q.all(forecastResults).then(function () {
-      return res.send(data);
+      deferred.resolve(data);
     });
   });
+
+  return deferred.promise;
+};
+
+app.post('/calendar/sync', function (req, res) {
+  doSync(req.query.access_token, req.query.refresh_token, req.query.person, req.query.calendar)
+    .then(function (data) {
+      return res.send(data);
+    });
 });
+
+// Every monday create the week events
+new CronJob('0 0 8 * * 1', function() {
+  syncs.findAll()
+    .then(function (rows) {
+      for (var i = 0; i < rows.length; i += 1) {
+        var row = rows[i];
+        doSync(null, row.refreshToken, row.personId, row.calendarId);
+      }
+    });
+}, null, true, 'Europe/Zurich');
