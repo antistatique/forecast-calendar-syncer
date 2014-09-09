@@ -125,7 +125,7 @@ app.post('/calendar/sync', function (req, res) {
 });
 
 // Every monday create the week events
-new CronJob('0 0 8 * * 1', function() {
+new CronJob('0 0 8 * * *', function() {
   syncs.findAll()
     .then(function (rows) {
       for (var i = 0; i < rows.length; i += 1) {
