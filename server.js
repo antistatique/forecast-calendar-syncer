@@ -7,6 +7,7 @@ var express = require('express'),
     people = require('./lib/forecast/people.js'),
     projects = require('./lib/forecast/projects.js'),
     calendar = require('./lib/calendar.js'),
+    config = require('./lib/config.js'),
     Q = require('q'),
     syncs = require('./lib/syncs.js'),
     CronJob = require('cron').CronJob;
@@ -28,7 +29,8 @@ app.get('/calendar/auth', function (req, res) {
   var url = oauth2Client.generateAuthUrl({
     access_type: 'offline', // 'online' (default) or 'offline' (gets refresh_token)
     scope: scopes, // If you only need one scope you can pass it as string
-    approval_prompt: 'force'
+    approval_prompt: 'force',
+    hd: config.DOMAIN
   });
 
   return res.redirect(url);
